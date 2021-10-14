@@ -1,0 +1,64 @@
+---
+title: "Case Study"
+author: Tanya Butt
+output: github_document
+  
+---
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## Load a dataset
+
+```{r}
+data("nyc_airbnb")
+force(nyc_airbnb)
+```
+
+*How many rentals are there? Of what type? In what places?
+*Is price correlated with review score?
+*Which neighborhood is most popular? Most expensive?
+*Which neighborhood has the highest reviews?
+*Is availability related to price?
+*Is room type related to neighborhood?
+*Is length of stay related to neighborhood group (borough)?
+
+```{r}
+nyc_airbnb =
+  nyc_airbnb %>% 
+  mutate(stars = review_scores_location / 2) %>% 
+  rename(borough = neighbourhood_group)
+```
+
+Let's try to count things:
+
+```{r}
+nyc_airbnb %>% 
+  janitor::tabyl(borough, room_type)
+
+
+nyc_airbnb %>% 
+  count(borough, room_type) %>% 
+  pivot_wider(
+    names_from = room_type,
+    values_from = n
+  )
+```
+
