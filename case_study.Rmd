@@ -104,8 +104,15 @@ nyc_airbnb %>%
 pal = colorNumeric("viridis", NULL)
 
 nyc_airbnb %>% 
+  mutate(
+    labels = str_c("<b>", price, "</b><br>", stars)
+  )
+
+nyc_airbnb %>% 
   filter(price < 500) %>% 
   sample_n(1000) %>% 
+  mutate(
+    labels = str_c("<b>Price", price, "</b><br>Stars:", stars)) %>% 
   leaflet() %>% 
   addProviderTiles(providers$CartoDB.Positron) %>% 
   addCircleMarkers(~lat, ~long, radius = 1, 
