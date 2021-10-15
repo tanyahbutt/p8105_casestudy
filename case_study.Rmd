@@ -7,6 +7,7 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(leaflet)
 library(p8105.datasets)
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -53,12 +54,61 @@ Let's try to count things:
 nyc_airbnb %>% 
   janitor::tabyl(borough, room_type)
 
-
 nyc_airbnb %>% 
   count(borough, room_type) %>% 
   pivot_wider(
     names_from = room_type,
     values_from = n
   )
+```
+
+Let's look at price and room type.
+```{r}
+nyc_airbnb %>% 
+  ggplot(aes(x = stars, y = price)) +
+  geom_point() +
+  facet_grid(. ~ room_type)
+```
+
+Price and Neighborhood
+
+```{r}
+nyc_airbnb %>% 
+  filter(borough == "Manhattan") %>% 
+  group_by(neighbourhood) %>% 
+  summarize(mean_price = mean(price, na.rm = TRUE)) %>% 
+arrange(mean_price)
+
+nyc_airbnb %>% 
+  filter(borough == "Manhattan", price <= 1000) %>% 
+  mutate(neighbourhood =
+           fct_reorder(neighbourhood, price)) %>% 
+  ggplot(aes(x = neighbourhood, y = price)) +
+  geom_boxplot() + 
+  coord_flip() +
+  facet_grid(. ~ room_type) 
+```
+
+Price versus location
+
+```{r}
+nyc_airbnb %>% 
+  filter(price < 500) %>% 
+  sample_n(5000) %>% 
+  ggplot(aes(x = lat, y = long, color = price)) +
+  geom_point()
+```
+
+## retry leaflet
+```{r, eval = FALSE}
+pal = colorNumeric("viridis", NULL)
+
+nyc_airbnb %>% 
+  filter(price < 500) %>% 
+  sample_n(1000) %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircleMarkers(~lat, ~long, radius = 1, 
+                  color = ~pal(price))
 ```
 
